@@ -1,0 +1,943 @@
+:root {
+    --navy-soft-bg: #131F3E;
+    --navy-mid: #1B2B52;
+    --navy-card: rgba(23, 37, 72, 0.72);
+    --navy-input: rgba(15, 25, 50, 0.65);
+
+    --gold-soft: #E5B869;
+    --gold-bright: #F3C677;
+    --gold-subtle-bg: rgba(229, 184, 105, 0.06);
+    --gold-subtle-border: rgba(229, 184, 105, 0.38);
+
+    --cyan-accent: #56CCF2;
+    --text-light: #F8FAFC;
+    --text-muted: #A3B3CC;
+    --border-glass: rgba(255, 255, 255, 0.14);
+    --danger: #EF4444;
+    --success: #10B981;
+    --green-neon: #34D399;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: 'Prompt', sans-serif;
+}
+
+body {
+    background-color: var(--navy-soft-bg);
+    color: var(--text-light);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 14px 20px;
+    overflow-x: hidden;
+    position: relative;
+}
+
+/* ==================== พื้นหลังสีกรมท่าละมุน + แสงทองจางๆ ==================== */
+.bg-aurora {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 0;
+    overflow: hidden;
+    background: radial-gradient(circle at 50% 25%, #243B6B 0%, #152244 55%, #0E1730 100%);
+}
+
+.orb {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(110px);
+    opacity: 0.25;
+    animation: floatOrb 20s infinite alternate ease-in-out;
+}
+
+.orb-1 {
+    width: 450px;
+    height: 450px;
+    background: #3B82F6;
+    top: -12%;
+    left: -8%;
+}
+
+.orb-2 {
+    width: 380px;
+    height: 380px;
+    background: #FDE68A;
+    opacity: 0.12;
+    bottom: -10%;
+    right: -5%;
+    animation-duration: 25s;
+}
+
+.orb-3 {
+    width: 320px;
+    height: 320px;
+    background: #38BDF8;
+    opacity: 0.18;
+    top: 35%;
+    left: 55%;
+    animation-duration: 18s;
+}
+
+@keyframes floatOrb {
+    0% { transform: translate(0, 0) scale(1); }
+    50% { transform: translate(45px, -35px) scale(1.08); }
+    100% { transform: translate(-35px, 40px) scale(0.95); }
+}
+
+#particleCanvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 1;
+    pointer-events: none;
+}
+
+/* ==================== โครงสร้างแนวนอน Widescreen พอดีจอ Full HD ==================== */
+.app-container {
+    position: relative;
+    z-index: 2;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.glass-card {
+    background: var(--navy-card);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+    border: 1px solid var(--border-glass);
+    border-radius: 20px;
+    padding: 22px 26px;
+    width: 100%;
+    box-shadow: 0 20px 45px rgba(0, 0, 0, 0.45);
+    display: none;
+    animation: fadeIn 0.35s ease;
+}
+
+.login-card {
+    max-width: 440px;
+}
+
+.employee-wide-card,
+.admin-card {
+    max-width: 1180px;
+}
+
+.view-section.active {
+    display: block;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* ==================== แถบด้านบน (Top Bar) ==================== */
+.top-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.04);
+    padding: 10px 16px;
+    border-radius: 12px;
+    margin-bottom: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.user-info-inline {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.user-info-inline h3 {
+    font-size: 15px;
+    font-weight: 600;
+}
+
+.dept-divider {
+    color: rgba(255, 255, 255, 0.2);
+}
+
+.user-info-inline small {
+    color: var(--text-muted);
+    font-size: 12.5px;
+}
+
+.header-center-title h2 {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--gold-bright);
+}
+
+.role-tag {
+    font-size: 10.5px;
+    font-weight: 700;
+    letter-spacing: 0.8px;
+    background: rgba(86, 204, 242, 0.18);
+    color: var(--cyan-accent);
+    padding: 3px 8px;
+    border-radius: 5px;
+}
+
+.role-tag.admin-tag {
+    background: rgba(229, 184, 105, 0.2);
+    color: var(--gold-bright);
+}
+
+.top-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.btn-change-pass {
+    background: rgba(229, 184, 105, 0.14);
+    color: var(--gold-bright);
+    border: 1px solid rgba(229, 184, 105, 0.35);
+    padding: 6px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 12.5px;
+    font-weight: 500;
+    transition: 0.2s;
+}
+
+.btn-change-pass:hover {
+    background: var(--gold-soft);
+    color: #0F172A;
+}
+
+.btn-logout {
+    background: rgba(239, 68, 68, 0.15);
+    color: #FCA5A5;
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    padding: 6px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 12.5px;
+    transition: 0.2s;
+}
+
+.btn-logout:hover {
+    background: var(--danger);
+    color: white;
+}
+
+/* ==================== Grid แนวนอน ซ้าย-ขวา ==================== */
+.calc-horizontal-grid {
+    display: grid;
+    grid-template-columns: 1.15fr 1.05fr;
+    gap: 22px;
+    align-items: stretch;
+}
+
+.calc-left-panel {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.calc-right-panel {
+    display: flex;
+    flex-direction: column;
+}
+
+.dual-input-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+}
+
+@media (max-width: 960px) {
+    .calc-horizontal-grid {
+        grid-template-columns: 1fr;
+    }
+    .dual-input-row {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* ==================== ฟอร์มและ Input ==================== */
+.brand-header {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.logo-badge {
+    width: 52px;
+    height: 52px;
+    margin: 0 auto 10px;
+    background: linear-gradient(135deg, var(--gold-bright), #C59341);
+    color: #0F172A;
+    font-weight: 700;
+    font-size: 20px;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.panel-heading {
+    margin-bottom: 12px;
+    font-size: 15.5px;
+    color: var(--text-light);
+}
+
+.subtitle, .help-text {
+    color: var(--text-muted);
+    font-size: 13px;
+    margin-bottom: 8px;
+}
+
+.form-group {
+    margin-bottom: 14px;
+}
+
+.label-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 5px;
+    gap: 8px;
+}
+
+.label-with-badge {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+label {
+    font-size: 13.5px;
+    font-weight: 500;
+    color: #E2E8F0;
+    display: block;
+    margin-bottom: 5px;
+}
+
+.label-row label {
+    margin-bottom: 0;
+}
+
+.input-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+input[type="text"],
+input[type="password"],
+input[type="number"],
+textarea {
+    width: 100%;
+    padding: 10px 40px 10px 12px;
+    background: var(--navy-input);
+    border: 1px solid rgba(163, 179, 204, 0.25);
+    border-radius: 10px;
+    color: var(--text-light);
+    font-size: 14px;
+    transition: all 0.2s ease;
+}
+
+input[type="month"] {
+    width: 100%;
+    min-width: 0;
+    padding: 8px 10px;
+    background: var(--navy-input);
+    border: 1px solid rgba(163, 179, 204, 0.28);
+    border-radius: 8px;
+    color: var(--text-light);
+    font-size: 13px;
+    color-scheme: dark;
+}
+
+input:focus, textarea:focus {
+    outline: none;
+    border-color: var(--gold-soft);
+    box-shadow: 0 0 0 2px rgba(229, 184, 105, 0.18);
+}
+
+input.modified {
+    border-color: var(--gold-subtle-border);
+    background: var(--gold-subtle-bg);
+}
+
+.mod-badge {
+    font-size: 11px;
+    color: var(--gold-bright);
+    opacity: 0;
+    transition: opacity 0.25s ease;
+    white-space: nowrap;
+}
+
+.mod-badge.visible {
+    opacity: 0.85;
+}
+
+/* ==================== ลิงก์ลืมรหัสผ่าน ==================== */
+.forgot-link-row {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: -2px;
+    margin-bottom: 14px;
+}
+
+.btn-link-forgot {
+    background: none;
+    border: none;
+    color: var(--cyan-accent);
+    font-size: 12.5px;
+    cursor: pointer;
+    text-decoration: underline;
+    transition: color 0.2s;
+}
+
+.btn-link-forgot:hover {
+    color: var(--gold-bright);
+}
+
+/* ==================== ปุ่มลูกตา SVG ==================== */
+.eye-btn {
+    position: absolute;
+    right: 8px;
+    background: transparent;
+    border: none;
+    color: var(--text-muted);
+    cursor: pointer;
+    padding: 5px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: 0.2s;
+}
+
+.eye-btn:hover {
+    color: var(--gold-bright);
+    background: rgba(255, 255, 255, 0.06);
+}
+
+.eye-btn svg {
+    width: 18px;
+    height: 18px;
+}
+
+.hidden {
+    display: none !important;
+}
+
+/* ==================== กล่องเกร็ดความรู้ที่มาของสูตร ==================== */
+.formula-tip {
+    margin-bottom: 14px;
+    padding: 9px 12px;
+    background: rgba(86, 204, 242, 0.07);
+    border-left: 3px solid var(--cyan-accent);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 12px;
+    color: #CBD5E1;
+    line-height: 1.45;
+}
+
+.formula-tip code {
+    background: rgba(15, 23, 42, 0.55);
+    color: var(--gold-bright);
+    padding: 1px 6px;
+    border-radius: 4px;
+    font-weight: 600;
+}
+
+.privacy-note {
+    display: inline-block;
+    margin-left: 6px;
+    color: var(--text-muted);
+    font-size: 11.5px;
+}
+
+/* ==================== ปุ่มสลับเลือกเรท x1.1 / x1.3 ==================== */
+.rate-switcher {
+    display: inline-flex;
+    background: rgba(15, 23, 42, 0.65);
+    padding: 2px;
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.rate-pill {
+    background: transparent;
+    border: none;
+    color: var(--text-muted);
+    padding: 3px 10px;
+    font-size: 12px;
+    font-weight: 600;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.rate-pill.active {
+    background: linear-gradient(135deg, var(--gold-bright), #D49B43);
+    color: #0F172A;
+}
+
+/* ==================== ปุ่มกดหลัก & การเว้นระยะห่างปุ่ม (ข้อ 1 และ ข้อ 3) ==================== */
+.btn-primary {
+    width: 100%;
+    padding: 11px 16px;
+    background: linear-gradient(135deg, #3B82F6, #2563EB);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.15s, box-shadow 0.2s;
+}
+
+.btn-primary.btn-gold {
+    background: linear-gradient(135deg, var(--gold-bright), #C89136);
+    color: #0F172A;
+    box-shadow: 0 6px 16px rgba(229, 184, 105, 0.22);
+}
+
+.btn-primary:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 8px 20px rgba(59, 130, 246, 0.35);
+}
+
+.btn-primary.btn-gold:hover {
+    box-shadow: 0 8px 20px rgba(229, 184, 105, 0.35);
+}
+
+/* จัดกลุ่มปุ่มในฟอร์ม Admin ให้เว้นบรรทัดสวยงาม ไม่ติดกัน */
+.btn-group-spaced {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 8px;
+}
+
+.sub-action-row {
+    display: grid;
+    grid-template-columns: 1.3fr 1fr;
+    gap: 10px;
+}
+
+.btn-reset-pass {
+    padding: 10px 14px;
+    background: rgba(245, 158, 11, 0.14);
+    color: var(--gold-bright);
+    border: 1px solid rgba(245, 158, 11, 0.4);
+    border-radius: 10px;
+    font-size: 13.5px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn-reset-pass:hover {
+    background: var(--gold-soft);
+    color: #0F172A;
+}
+
+.btn-secondary {
+    padding: 10px 16px;
+    background: rgba(255, 255, 255, 0.08);
+    color: var(--text-light);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    border-radius: 10px;
+    font-size: 13.5px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.2s, border-color 0.2s;
+}
+
+.btn-secondary:hover {
+    background: rgba(255, 255, 255, 0.15);
+    border-color: rgba(255, 255, 255, 0.3);
+}
+
+.full-width-spaced {
+    width: 100%;
+    margin-top: 12px;
+}
+
+/* ==================== กล่องสรุปผลลัพธ์ + ยอดเงินสีเขียว + ตารางประวัติพนักงาน ==================== */
+.result-box {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    background: rgba(15, 25, 50, 0.72);
+    border: 1px solid rgba(229, 184, 105, 0.3);
+    border-radius: 14px;
+    padding: 16px;
+    gap: 12px;
+}
+
+.result-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+    color: var(--gold-bright);
+    font-size: 13.5px;
+}
+
+.empty-result-state {
+    text-align: center;
+    padding: 18px 12px;
+    color: var(--text-muted);
+    font-size: 13px;
+    line-height: 1.5;
+    border: 1px dashed rgba(255, 255, 255, 0.12);
+    border-radius: 10px;
+    margin: 4px 0;
+}
+
+.result-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 5px 0;
+    border-bottom: 1px dashed rgba(255, 255, 255, 0.1);
+    font-size: 13px;
+}
+
+.result-summary {
+    margin-top: 6px;
+    padding-top: 6px;
+    border-top: 1px solid rgba(255, 255, 255, 0.18);
+}
+
+.total-pay-highlight {
+    font-size: 19px;
+    font-weight: 700;
+    color: var(--green-neon);
+    text-shadow: 0 0 12px rgba(52, 211, 153, 0.35);
+}
+
+.green-amount {
+    color: var(--green-neon);
+    font-weight: 600;
+}
+
+.save-record-section {
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.save-label {
+    display: block;
+    font-size: 12px;
+    margin-bottom: 5px;
+    color: #CBD5E1;
+}
+
+.save-row {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 8px;
+    align-items: center;
+    width: 100%;
+    margin-bottom: 4px;
+}
+
+.btn-save-log {
+    background: var(--success);
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 12.5px;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background 0.2s;
+}
+
+.btn-save-log:hover {
+    background: #059669;
+}
+
+.save-hint {
+    display: block;
+    font-size: 11px;
+    color: var(--text-muted);
+}
+
+.emp-history-section {
+    border-top: 1px solid rgba(255, 255, 255, 0.12);
+    padding-top: 10px;
+}
+
+.emp-history-header h5 {
+    font-size: 13px;
+    color: var(--cyan-accent);
+    margin-bottom: 6px;
+}
+
+.emp-history-scroll {
+    max-height: 125px;
+    overflow-y: auto;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 8px;
+    background: rgba(10, 18, 38, 0.55);
+}
+
+.compact-table th,
+.compact-table td {
+    padding: 6px 8px !important;
+    font-size: 12px !important;
+}
+
+@media (max-width: 480px) {
+    .save-row,
+    .sub-action-row {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* ==================== หน้า Admin & ตาราง ==================== */
+.divider {
+    border: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent);
+    margin: 18px 0;
+}
+
+.admin-tabs {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 16px;
+}
+
+.tab-btn {
+    padding: 8px 16px;
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--text-muted);
+    border: 1px solid var(--border-glass);
+    border-radius: 10px;
+    cursor: pointer;
+    font-weight: 500;
+}
+
+.tab-btn.active {
+    background: var(--gold-soft);
+    color: #0F172A;
+    font-weight: 600;
+}
+
+.admin-tab-content { display: none; }
+.admin-tab-content.active { display: block; }
+
+.admin-grid {
+    display: grid;
+    grid-template-columns: 1fr 1.45fr;
+    gap: 24px;
+}
+
+@media (max-width: 900px) {
+    .admin-grid { grid-template-columns: 1fr; }
+}
+
+.table-scroll {
+    overflow-x: auto;
+    max-height: 390px;
+}
+
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+}
+
+.data-table th, .data-table td {
+    padding: 10px 10px;
+    text-align: left;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    vertical-align: middle;
+}
+
+.data-table th {
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--gold-bright);
+    position: sticky;
+    top: 0;
+}
+
+.pass-cell-wrapper {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.table-pass-input {
+    background: transparent !important;
+    border: none !important;
+    padding: 0 !important;
+    width: 75px !important;
+    font-family: monospace;
+    font-size: 13px !important;
+    color: var(--text-light);
+    pointer-events: none;
+}
+
+.mini-eye-btn {
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    color: var(--text-muted);
+    border-radius: 5px;
+    padding: 3px 5px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+}
+
+.mini-eye-btn:hover {
+    color: var(--gold-bright);
+    border-color: var(--gold-soft);
+}
+
+.mini-eye-btn svg {
+    width: 14px;
+    height: 14px;
+}
+
+.action-btn {
+    padding: 5px 9px;
+    border-radius: 6px;
+    border: none;
+    cursor: pointer;
+    font-size: 11.5px;
+    font-weight: 500;
+    margin-right: 4px;
+    transition: opacity 0.2s;
+}
+
+.action-btn:hover {
+    opacity: 0.88;
+}
+
+.btn-edit { background: var(--cyan-accent); color: #0F172A; }
+.btn-reset-row { background: var(--gold-soft); color: #0F172A; }
+.btn-del { background: var(--danger); color: white; }
+
+.filter-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 14px;
+    flex-wrap: wrap;
+}
+
+.filter-input-group {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.security-badge {
+    background: rgba(16, 185, 129, 0.12);
+    border: 1px solid rgba(16, 185, 129, 0.3);
+    color: #6EE7B7;
+    padding: 7px 12px;
+    border-radius: 8px;
+    font-size: 12px;
+}
+
+/* ==================== MODAL ==================== */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(8, 14, 30, 0.78);
+    backdrop-filter: blur(8px);
+    z-index: 999;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 16px;
+}
+
+.modal-card {
+    background: #182649;
+    border: 1px solid rgba(229, 184, 105, 0.4);
+    border-radius: 18px;
+    padding: 24px;
+    width: 100%;
+    max-width: 420px;
+    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.65);
+    animation: fadeIn 0.25s ease;
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+}
+
+.modal-header h3 {
+    font-size: 17px;
+    color: var(--gold-bright);
+}
+
+.modal-close {
+    background: transparent;
+    border: none;
+    color: var(--text-muted);
+    font-size: 18px;
+    cursor: pointer;
+}
+
+/* เว้นระยะปุ่มในหน้าต่าง Modal ให้สวยงาม */
+.modal-actions {
+    display: grid;
+    grid-template-columns: 1.4fr 1fr;
+    gap: 12px;
+    margin-top: 14px;
+}
+
+.popup-alert-card {
+    text-align: center;
+    max-width: 390px;
+}
+
+.popup-icon {
+    font-size: 38px;
+    margin-bottom: 10px;
+}
+
+.popup-message {
+    margin: 14px 0 20px;
+    padding: 12px;
+    background: rgba(86, 204, 242, 0.1);
+    border: 1px solid rgba(86, 204, 242, 0.3);
+    border-radius: 10px;
+    font-size: 15px;
+    color: #F8FAFC;
+}
+
+.popup-message strong {
+    color: var(--gold-bright);
+}

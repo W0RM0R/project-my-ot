@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Executive OT Calculator & Management</title>
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- พื้นหลังโทนกรมท่าละมุน + แสงหิ่งห้อย/หิมะขยับตามเมาส์ -->
+    <div class="bg-aurora">
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+        <div class="orb orb-3"></div>
+    </div>
+    <canvas id="particleCanvas"></canvas>
+
+    <div class="app-container">
+
+        <!-- ==================== 1. หน้า LOGIN ==================== -->
+        <section id="loginView" class="glass-card login-card view-section active">
+            <div class="brand-header">
+                <div class="logo-badge">OT</div>
+                <h1>ระบบคำนวณและจัดการโอที</h1>
+                <p class="subtitle">เข้าสู่ระบบด้วยรหัสพนักงานเพื่อใช้งาน</p>
+            </div>
+
+            <form id="loginForm" onsubmit="handleLogin(event)">
+                <div class="form-group">
+                    <label>รหัสพนักงาน / User ID</label>
+                    <div class="input-wrapper">
+                        <input type="text" id="loginId" placeholder="กรอกรหัสพนักงาน หรือ User ID" required autocomplete="username">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>รหัสผ่าน (Password)</label>
+                    <div class="input-wrapper">
+                        <input type="password" id="loginPassword" placeholder="กรอกรหัสผ่าน" required autocomplete="current-password">
+                        <button type="button" class="eye-btn" onclick="togglePassword('loginPassword', this)" title="แสดง/ซ่อนรหัสผ่าน">
+                            <svg class="icon-eye-off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
+                                <line x1="1" y1="1" x2="23" y2="23"></line>
+                            </svg>
+                            <svg class="icon-eye-on hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                <circle cx="12" cy="12" r="3"></circle>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="forgot-link-row">
+                    <button type="button" class="btn-link-forgot" onclick="openForgotModal()">ลืมรหัสผ่าน?</button>
+                </div>
+
+                <button type="submit" class="btn-primary btn-gold">เข้าสู่ระบบ</button>
+            </form>
+        </section>
+
+        <!-- ==================== 2. หน้าคำนวณโอที (EMPLOYEE - แนวนอน WIDESCREEN) ==================== -->
+        <section id="employeeView" class="glass-card employee-wide-card view-section">
+            <div class="top-bar">
+                <div class="user-info-inline">
+                    <span class="role-tag">EMPLOYEE</span>
+                    <h3 id="empDisplayName">ชื่อพนักงาน</h3>
+                    <span class="dept-divider">|</span>
+                    <small id="empDisplayDept">รหัส: EMP001 | แผนก: IT</small>
+                </div>
+                <div class="header-center-title">
+                    <h2>💰 OT Calculator 💰</h2>
+                </div>
+                <div class="top-actions">
+                    <button type="button" class="btn-change-pass" onclick="openChangePasswordModal()">🔑 เปลี่ยนรหัสผ่าน</button>
+                    <button type="button" class="btn-logout" onclick="logout()">ออกจากระบบ</button>
+                </div>
+            </div>
+
+            <div class="calc-horizontal-grid">
+
+                <!-- ฝั่งซ้าย: กรอกเงินเดือน & ชั่วโมงโอที -->
+                <div class="calc-left-panel">
+                    <div class="dual-input-row">
+                        <div class="form-group">
+                            <div class="label-row">
+                                <label>เงินเดือน (บาท):</label>
+                                <span class="mod-badge" id="badge-salary">● มีการแก้ไขข้อมูล</span>
+                            </div>
+                            <div class="input-wrapper">
+                                <input type="password" id="salary" inputmode="decimal" placeholder="กรอกเงินเดือน" oninput="handleSalaryInput(this)">
+                                <button type="button" class="eye-btn" onclick="togglePassword('salary', this)" title="แสดง/ซ่อนเงินเดือน">
+                                    <svg class="icon-eye-off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
+                                        <line x1="1" y1="1" x2="23" y2="23"></line>
+                                    </svg>
+                                    <svg class="icon-eye-on hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                        <circle cx="12" cy="12" r="3"></circle>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <div class="label-row">
+                                <label>ค่าแรงต่อชั่วโมง (บาท):</label>
+                                <span class="mod-badge" id="badge-hourlyRate">● คำนวณอัตโนมัติ</span>
+                            </div>
+                            <div class="input-wrapper">
+                                <input type="password" id="hourlyRate" placeholder="เช่น 75.00" readonly>
+                                <button type="button" class="eye-btn" onclick="togglePassword('hourlyRate', this)" title="แสดง/ซ่อนค่าแรงต่อชั่วโมง">
+                                    <svg class="icon-eye-off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
+                                        <line x1="1" y1="1" x2="23" y2="23"></line>
+                                    </svg>
+                                    <svg class="icon-eye-on hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                        <circle cx="12" cy="12" r="3"></circle>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- เกร็ดความรู้ที่มาของสูตร -->
+                    <div class="formula-tip">
+                        <div class="tip-icon">💡</div>
+                        <div class="tip-content">
+                            <strong>เกร็ดความรู้ที่มาของสูตร:</strong> ค่าแรงต่อชั่วโมงคำนวณจาก 
+                            <code>(เงินเดือน ÷ 25 วันทำงาน) ÷ 8 ชั่วโมง</code> (หรือ เงินเดือน ÷ 200)
+                            <span class="privacy-note">🔒 ประมวลผลบนหน้าจอเท่านั้น ไม่มีการบันทึกเงินเดือน</span>
+                        </div>
+                    </div>
+
+                    <!-- แถวเลือกเรท OT x1.1 หรือ x1.3 -->
+                    <div class="form-group">
+                        <div class="label-row">
+                            <div class="label-with-badge">
+                                <label id="dynamicOtLabel">OT x1.3 (ชั่วโมง):</label>
+                                <span class="mod-badge" id="badge-otSpecial">● มีการแก้ไขข้อมูล</span>
+                            </div>
+                            <div class="rate-switcher">
+                                <button type="button" class="rate-pill" id="btnRate11" onclick="selectSpecialRate('1.1')">เรท x1.1</button>
+                                <button type="button" class="rate-pill active" id="btnRate13" onclick="selectSpecialRate('1.3')">เรท x1.3</button>
+                            </div>
+                        </div>
+                        <div class="input-wrapper">
+                            <input type="number" id="otSpecial" step="0.5" min="0" placeholder="จำนวนชั่วโมง OT *1.3" oninput="markModified(this, 'badge-otSpecial')">
+                        </div>
+                    </div>
+
+                    <!-- แถวคู่: OT x1.5 และ OT x3 -->
+                    <div class="dual-input-row">
+                        <div class="form-group">
+                            <div class="label-row">
+                                <label>OT x1.5 (ชั่วโมง):</label>
+                                <span class="mod-badge" id="badge-ot15">● มีการแก้ไขข้อมูล</span>
+                            </div>
+                            <div class="input-wrapper">
+                                <input type="number" id="ot15" step="0.5" min="0" placeholder="ชั่วโมง OT *1.5" oninput="markModified(this, 'badge-ot15')">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <div class="label-row">
+                                <label>OT x3 (ชั่วโมง):</label>
+                                <span class="mod-badge" id="badge-ot3">● มีการแก้ไขข้อมูล</span>
+                            </div>
+                            <div class="input-wrapper">
+                                <input type="number" id="ot3" step="0.5" min="0" placeholder="ชั่วโมง OT *3" oninput="markModified(this, 'badge-ot3')">
+                            </div>
+                        </div>
+                    </div>
+
+                    <button type="button" class="btn-primary btn-gold" onclick="calculateOT()">💰 คำนวณโอที 💰</button>
+                </div>
+
+                <!-- ฝั่งขวา: สรุปผลลัพธ์ + ปุ่มบันทึก + ประวัติการบันทึกของพนักงาน -->
+                <div class="calc-right-panel">
+                    <div id="resultBox" class="result-box">
+                        <div>
+                            <div class="result-header">
+                                <h4>📊 สรุปรายละเอียดการทำโอที</h4>
+                                <span id="selectedPeriodBadge">ประจำสัปดาห์/เดือนนี้</span>
+                            </div>
+
+                            <div id="resultDetails" class="result-details">
+                                <div class="empty-result-state">
+                                    ✨ กรอกเงินเดือนและจำนวนชั่วโมงโอทีด้านซ้าย<br>แล้วกดปุ่ม <strong>"คำนวณโอที"</strong> เพื่อดูสรุปยอดเงินที่นี่
+                                </div>
+                            </div>
+
+                            <div class="save-record-section">
+                                <label class="save-label">เลือกเดือนที่ต้องการส่งบันทึกโอที:</label>
+                                <div class="save-row">
+                                    <input type="month" id="recordMonth" required>
+                                    <button type="button" class="btn-save-log" onclick="saveOtRecordToAdmin()">📥 บันทึกยอดโอทีรายเดือน</button>
+                                </div>
+                                <small class="save-hint">*ระบบส่งเฉพาะชั่วโมงและยอดเงินโอทีรวม ไม่ส่งข้อมูลเงินเดือน</small>
+                            </div>
+                        </div>
+
+                        <div class="emp-history-section">
+                            <div class="emp-history-header">
+                                <h5>📋 ประวัติการบันทึกโอทีรายเดือนของคุณ</h5>
+                            </div>
+                            <div class="emp-history-scroll">
+                                <table class="data-table compact-table">
+                                    <thead>
+                                        <tr>
+                                            <th>เดือน</th>
+                                            <th>รายละเอียดเรท</th>
+                                            <th>รวม ชม.</th>
+                                            <th>ยอดรวม (THB)</th>
+                                            <th>ลบ</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="empPersonalLogBody"></tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- ==================== 3. หน้าจัดการระบบ (ADMIN DASHBOARD) ==================== -->
+        <section id="adminView" class="glass-card admin-card view-section">
+            <div class="top-bar">
+                <div class="user-info-inline">
+                    <span class="role-tag admin-tag">ADMINISTRATOR</span>
+                    <h3>ระบบจัดการข้อมูลพนักงานและตรวจสอบโอที</h3>
+                </div>
+                <div class="top-actions">
+                    <button type="button" class="btn-change-pass" onclick="openChangePasswordModal()">🔑 เปลี่ยนรหัสผ่าน Admin</button>
+                    <button type="button" class="btn-logout" onclick="logout()">ออกจากระบบ</button>
+                </div>
+            </div>
+
+            <div class="admin-tabs">
+                <button class="tab-btn active" onclick="switchAdminTab('empTab', this)">👥 จัดการรายชื่อพนักงาน</button>
+                <button class="tab-btn" onclick="switchAdminTab('otLogTab', this)">📈 ตรวจสอบบันทึกโอทีรายเดือน</button>
+            </div>
+
+            <!-- แท็บที่ 1: เพิ่ม / ลบ / แก้ไข / รีเซ็ทรหัสผ่าน / Import พนักงาน -->
+            <div id="empTab" class="admin-tab-content active">
+                <div class="admin-grid">
+                    <div class="admin-panel">
+                        <h4 id="formTitle" class="panel-heading">➕ เพิ่ม / แก้ไขข้อมูลพนักงาน</h4>
+                        <form id="empForm" onsubmit="saveEmployee(event)">
+                            <input type="hidden" id="editIndex" value="">
+                            <div class="dual-input-row">
+                                <div class="form-group">
+                                    <label>รหัสพนักงาน</label>
+                                    <div class="input-wrapper">
+                                        <input type="text" id="empIdInput" placeholder="เช่น EMP002" required>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label>แผนก (Department)</label>
+                                    <div class="input-wrapper">
+                                        <input type="text" id="empDeptInput" placeholder="เช่น IT, HR" required>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="dual-input-row">
+                                <div class="form-group">
+                                    <label>ชื่อ - นามสกุล</label>
+                                    <div class="input-wrapper">
+                                        <input type="text" id="empNameInput" placeholder="ระบุชื่อพนักงาน" required>
+                                    </div>
+                                </div>
+                                <!-- ข้อ 2: ช่องรหัสผ่านเข้าใช้งาน เป็น type password พร้อมลูกตา Show/Hide -->
+                                <div class="form-group">
+                                    <label>รหัสผ่านเข้าใช้งาน</label>
+                                    <div class="input-wrapper">
+                                        <input type="password" id="empPassInput" placeholder="กำหนดรหัสผ่าน" required>
+                                        <button type="button" class="eye-btn" onclick="togglePassword('empPassInput', this)" title="แสดง/ซ่อนรหัสผ่าน">
+                                            <svg class="icon-eye-off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
+                                                <line x1="1" y1="1" x2="23" y2="23"></line>
+                                            </svg>
+                                            <svg class="icon-eye-on hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                                <circle cx="12" cy="12" r="3"></circle>
+                                            </svg>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- ข้อ 1 และ ข้อ 3: เว้นบรรทัดกลุ่มปุ่มอย่างสวยงาม และเพิ่มปุ่มรีเซ็ทรหัสผ่าน -->
+                            <div class="btn-group-spaced">
+                                <button type="submit" class="btn-primary">💾 บันทึกพนักงาน</button>
+                                <div class="sub-action-row">
+                                    <button type="button" class="btn-reset-pass" onclick="resetPasswordInForm()">🔄 รีเซ็ทรหัสผ่าน (1234)</button>
+                                    <button type="button" class="btn-secondary" onclick="resetEmpForm()">🧹 ล้างค่า</button>
+                                </div>
+                            </div>
+                        </form>
+
+                        <hr class="divider">
+
+                        <h4 class="panel-heading">📂 Import รายชื่อพนักงานจำนวนมาก (CSV)</h4>
+                        <p class="help-text">วางข้อมูลรูปแบบ: <code>รหัสพนักงาน,ชื่อ-นามสกุล,แผนก,รหัสผ่าน</code></p>
+                        <textarea id="bulkImportText" rows="2" placeholder="EMP003,สมชาย ใจดี,Network,1234&#10;EMP004,วิภาวรรณ รักงาน,Support,5678"></textarea>
+                        <button type="button" class="btn-secondary full-width-spaced" onclick="importEmployees()">⚡ นำเข้าข้อมูลพนักงาน (Import)</button>
+                    </div>
+
+                    <div class="admin-table-wrapper">
+                        <h4 class="panel-heading">📋 รายชื่อพนักงานทั้งหมดในระบบ</h4>
+                        <div class="table-scroll">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>รหัส</th>
+                                        <th>ชื่อ-นามสกุล</th>
+                                        <th>แผนก</th>
+                                        <th>รหัสผ่าน</th>
+                                        <th>จัดการ</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="empTableBody"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- แท็บที่ 2: ตรวจสอบรายการโอทีรายเดือน -->
+            <div id="otLogTab" class="admin-tab-content">
+                <div class="filter-bar">
+                    <div class="filter-input-group">
+                        <label>กรองตามเดือน:</label>
+                        <input type="month" id="filterMonth" onchange="renderOtLogs()">
+                    </div>
+                    <div class="security-badge">
+                        🛡️ ตารางนี้แสดงเฉพาะชั่วโมงโอทีและยอดเงินรวม ไม่มีการจัดเก็บฐานเงินเดือนพนักงาน
+                    </div>
+                </div>
+
+                <div class="table-scroll">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>เดือน/ปี</th>
+                                <th>รหัสพนักงาน</th>
+                                <th>ชื่อ-นามสกุล</th>
+                                <th>แผนก</th>
+                                <th>รายละเอียดชั่วโมงตามเรท</th>
+                                <th>รวมชั่วโมง/สัปดาห์</th>
+                                <th>ยอดเงินโอทีรวม (THB)</th>
+                                <th>ลบ</th>
+                            </tr>
+                        </thead>
+                        <tbody id="otLogTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+    </div>
+
+    <!-- ==================== MODAL 1: เปลี่ยนรหัสผ่านด้วยตัวเอง (Admin & Employee) ==================== -->
+    <div id="changePasswordModal" class="modal-overlay hidden">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h3>🔑 เปลี่ยนรหัสผ่านผู้ใช้งาน</h3>
+                <button type="button" class="modal-close" onclick="closeChangePasswordModal()">✕</button>
+            </div>
+            <form id="changePasswordForm" onsubmit="handleChangePassword(event)">
+                <div class="form-group">
+                    <label>รหัสผ่านเดิม (Old Password)</label>
+                    <div class="input-wrapper">
+                        <input type="password" id="oldPassword" placeholder="กรอกรหัสผ่านเดิม" required>
+                        <button type="button" class="eye-btn" onclick="togglePassword('oldPassword', this)">
+                            <svg class="icon-eye-off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
+                                <line x1="1" y1="1" x2="23" y2="23"></line>
+                            </svg>
+                            <svg class="icon-eye-on hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                <circle cx="12" cy="12" r="3"></circle>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>รหัสผ่านใหม่ (New Password)</label>
+                    <div class="input-wrapper">
+                        <input type="password" id="newPassword" placeholder="กำหนดรหัสผ่านใหม่" required>
+                        <button type="button" class="eye-btn" onclick="togglePassword('newPassword', this)">
+                            <svg class="icon-eye-off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
+                                <line x1="1" y1="1" x2="23" y2="23"></line>
+                            </svg>
+                            <svg class="icon-eye-on hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                <circle cx="12" cy="12" r="3"></circle>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>ยืนยันรหัสผ่านใหม่ (Confirm New Password)</label>
+                    <div class="input-wrapper">
+                        <input type="password" id="confirmNewPassword" placeholder="กรอกรหัสผ่านใหม่อีกครั้ง" required>
+                        <button type="button" class="eye-btn" onclick="togglePassword('confirmNewPassword', this)">
+                            <svg class="icon-eye-off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
+                                <line x1="1" y1="1" x2="23" y2="23"></line>
+                            </svg>
+                            <svg class="icon-eye-on hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                <circle cx="12" cy="12" r="3"></circle>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="forgot-link-row">
+                    <button type="button" class="btn-link-forgot" onclick="openForgotModal()">ลืมรหัสผ่านเดิม?</button>
+                </div>
+
+                <div class="modal-actions">
+                    <button type="submit" class="btn-primary btn-gold">บันทึกรหัสผ่านใหม่</button>
+                    <button type="button" class="btn-secondary" onclick="closeChangePasswordModal()">ยกเลิก</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ==================== MODAL 2: POP-UP แจ้งเตือนลืมรหัสผ่าน ==================== -->
+    <div id="forgotPasswordModal" class="modal-overlay hidden">
+        <div class="modal-card popup-alert-card">
+            <div class="popup-icon">🛡️</div>
+            <h3>แจ้งเตือนการกู้คืนรหัสผ่าน</h3>
+            <p class="popup-message">กรุณาติดต่อ ADMIN : <strong>woramet@hoya.com</strong></p>
+            <button type="button" class="btn-primary btn-gold" onclick="closeForgotModal()">ตกลง (OK)</button>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
